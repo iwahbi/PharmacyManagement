@@ -1,16 +1,21 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from bson import ObjectId
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../angular-app/dist/angular-app", template_folder="../angular-app/dist/angular-app")
 CORS(app)
 
-app.config['MONGO_URI'] = 'mongodb://localhost:27017/IhssaneWahbiM'  
+app.config['MONGO_URI'] = 'mongodb://localhost:27017/IhssaneWahbiM'
 mongo = PyMongo(app)
 
+# Route to serve the main Angular app
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 # Route for adding a new drug
-@app.route('/drugs', methods=['POST'])
+@app.route('/api/drugs', methods=['POST'])
 def add_drug():
     try:
         data = request.json
@@ -21,7 +26,7 @@ def add_drug():
         return jsonify({'error': str(e)})
 
 # Route for getting all drugs
-@app.route('/drugs', methods=['GET'])
+@app.route('/api/drugs', methods=['GET'])
 def get_all_drugs():
     try:
         drugs_collection = mongo.db.drugs
@@ -31,7 +36,7 @@ def get_all_drugs():
         return jsonify({'error': str(e)})
 
 # Route for getting a specific drug by ID
-@app.route('/drugs/<drug_id>', methods=['GET'])
+@app.route('/api/drugs/<drug_id>', methods=['GET'])
 def get_drug(drug_id):
     try:
         drugs_collection = mongo.db.drugs
@@ -44,7 +49,7 @@ def get_drug(drug_id):
         return jsonify({'error': str(e)})
 
 # Route for updating a drug by ID
-@app.route('/drugs/<drug_id>', methods=['PUT'])
+@app.route('/api/drugs/<drug_id>', methods=['PUT'])
 def update_drug(drug_id):
     try:
         data = request.json
@@ -58,7 +63,7 @@ def update_drug(drug_id):
         return jsonify({'error': str(e)})
 
 # Route for deleting a drug by ID
-@app.route('/drugs/<drug_id>', methods=['DELETE'])
+@app.route('/api/drugs/<drug_id>', methods=['DELETE'])
 def delete_drug(drug_id):
     try:
         drugs_collection = mongo.db.drugs
